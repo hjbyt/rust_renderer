@@ -1,4 +1,5 @@
 use vector::Vector;
+use ray::Ray;
 
 pub struct Camera {
     pub position: Vector,
@@ -11,8 +12,8 @@ pub struct Camera {
     pub image_height: i64,
     pub image_width: i64,
     pub screen_center: Vector,
-//    pub aperature_size : f64,
-//    pub dof_rays : i64,
+    //    pub aperature_size : f64,
+    //    pub dof_rays : i64,
 }
 
 impl Camera {
@@ -40,5 +41,14 @@ impl Camera {
             image_width: image_width,
             screen_center: position + direction * screen_distance
         }
+    }
+
+    pub fn construct_ray_through_pixel(self, x: i64, y: i64) -> Ray {
+        let pixel_width = self.screen_width / self.image_width as f64;
+        let pixel_height = self.screen_height / self.image_height as f64;
+        let y_offset = y as f64 * pixel_height - (self.screen_height / 2.0);
+        let x_offset = x as f64 * pixel_width - (self.screen_width / 2.0);
+        let pixel_position = self.screen_center + self.up * y_offset + self.right * x_offset;
+        Ray::construct_ray(self.position, pixel_position)
     }
 }
