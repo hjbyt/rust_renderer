@@ -9,8 +9,8 @@ pub struct Camera {
     pub screen_distance: f64,
     pub screen_height: f64,
     pub screen_width: f64,
-    pub image_height: i64,
-    pub image_width: i64,
+    pub image_height: u32,
+    pub image_width: u32,
     pub screen_center: Vector,
     //    pub aperature_size : f64,
     //    pub dof_rays : i64,
@@ -23,8 +23,8 @@ impl Camera {
         up: Vector,
         screen_distance: f64,
         screen_width: f64,
-        image_height: i64,
-        image_width: i64
+        image_height: u32,
+        image_width: u32
     ) -> Camera {
         let direction = position.direction_to(look_at);
         let right = (up ^ direction).normalize();

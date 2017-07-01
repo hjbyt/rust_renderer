@@ -10,7 +10,7 @@ use color_image::ColorImage;
 pub struct Scene {
     pub background_color: Color,
     pub objects: Vec<Box<ModelObject>>,
-    pub camera : Camera,
+    pub camera: Camera,
     //    pub lights: Vec<Light>,
 }
 
@@ -39,9 +39,21 @@ pub fn get_simple_scene() -> Scene {
 }
 
 impl Scene {
-    pub fn render(self) -> ColorImage {
+    pub fn render(&self) -> ColorImage {
+        let width = self.camera.image_width;
+        let height = self.camera.image_height;
+        let mut color_image = ColorImage::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                color_image[(x as usize, y as usize)] = self.render_pixel(x, y);
+            }
+        }
+        color_image
+    }
+
+    pub fn render_pixel(&self, x: u32, y: u32) -> Color {
         //TODO
-        ColorImage::new(1, 1)
+        BLACK
     }
 }
 
