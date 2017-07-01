@@ -41,7 +41,7 @@ pub fn get_simple_scene() -> Scene {
 impl Scene {
     pub fn render(self) -> ColorImage {
         //TODO
-        ColorImage::new(0, 0)
+        ColorImage::new(1, 1)
     }
 }
 

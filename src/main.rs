@@ -12,9 +12,9 @@ mod ray_tracer;
 extern crate image;
 
 fn main() {
-    let mut img = color_image::ColorImage::new(500, 500);
-    img[(100, 100)] = color::Color::new(1.0, 1.0, 1.0);
-    let img_buf = img.to_image_buffer();
-    img_buf.save("output.png").unwrap();
-    println!("{:?}", 123);
+    let scene = ray_tracer::get_simple_scene();
+    let color_image = scene.render();
+    let image_buffer = color_image.to_image_buffer();
+    image_buffer.save("output.png").unwrap();
+    println!("Done");
 }
