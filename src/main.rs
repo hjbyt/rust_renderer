@@ -1,3 +1,7 @@
+mod vector;
+mod sphere;
+
 fn main() {
-    println!("Hello, world!");
+    let s = sphere::Sphere { center: vector::ZERO, radius: 1.0 };
+    println!("{:?}", s);
 }

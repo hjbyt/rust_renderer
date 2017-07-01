@@ -1,10 +1,10 @@
 use std::ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign, Neg, Rem, BitXor};
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
-struct Vector {
-    x: f64,
-    y: f64,
-    z: f64,
+pub struct Vector {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 
@@ -12,24 +12,19 @@ struct Vector {
 //
 //
 
+pub const ZERO: Vector = Vector { x: 0.0, y: 0.0, z: 0.0 };
+
 impl Vector {
-    pub fn zero() -> Vector {
-        Vector { x: 0.0, y: 0.0, z: 0.0 }
-    }
-
-    pub fn new(x: f64, y: f64, z: f64) -> Vector {
-        Vector { x: x, y: y, z: z }
-    }
-
     pub fn dot(a: Vector, b: Vector) -> f64 {
         a.x * b.x + a.y * b.y + a.z * b.z
     }
 
     pub fn cross(a: Vector, b: Vector) -> Vector {
-        Vector::new(
-            a.y * b.z - a.z * b.y,
-            b.x * a.z - b.z * a.x,
-            a.x * b.y - a.y * b.x)
+        Vector {
+            x: a.y * b.z - a.z * b.y,
+            y: b.x * a.z - b.z * a.x,
+            z: a.x * b.y - a.y * b.x
+        }
     }
 
     pub fn norm_squared(self) -> f64 {
