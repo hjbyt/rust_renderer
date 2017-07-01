@@ -61,6 +61,14 @@ impl Vector {
     pub fn distance(a: Vector, b: Vector) -> f64 {
         a.distance_to(b)
     }
+
+    pub fn almost_equal_to(self, other: Vector, epsilon: f64) -> bool {
+        self.distance_to(other) <= epsilon
+    }
+
+    pub fn almost_equals(a: Vector, b: Vector, epsilon: f64) -> bool {
+        a.almost_equal_to(b, epsilon)
+    }
 }
 
 //
