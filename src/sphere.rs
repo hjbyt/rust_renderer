@@ -1,23 +1,30 @@
+use model_object::ModelObject;
 use vector::Vector;
 use ray::Ray;
 use hit::Hit;
+use material::Material;
 use std::option::Option::{None, Some};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Sphere {
+    pub material: Material,
     pub center: Vector,
     pub radius: f64
 }
 
-impl Sphere {
-    pub fn try_hit(self, ray: Ray) -> Option<Hit> {
+impl ModelObject for Sphere {
+    fn material(self) -> Material {
+        self.material
+    }
+
+    fn try_hit(self, ray: Ray) -> Option<Hit> {
         // Geometric method
-        let L = self.center - ray.position;
-        let t_ca = L % ray.direction;
+        let el = self.center - ray.position;
+        let t_ca = el % ray.direction;
         if t_ca < 0.0 {
             return None;
         }
-        let d_square = L.norm_squared() - (t_ca * t_ca);
+        let d_square = el.norm_squared() - (t_ca * t_ca);
         let r_square = self.radius * self.radius;
         if (d_square > r_square) {
             return None;
