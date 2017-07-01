@@ -15,6 +15,10 @@ pub struct Color {
 pub const BLACK: Color = Color { r: 0.0, g: 0.0, b: 0.0 };
 
 impl Color {
+    pub fn new(r: f64, g: f64, b: f64) -> Color {
+        Color { r: r, g: g, b: b }
+    }
+
     pub fn clamp(&mut self) {
         self.r = self.r.max(0.0).min(1.0);
         self.g = self.g.max(0.0).min(1.0);

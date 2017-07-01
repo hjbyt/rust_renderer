@@ -15,6 +15,10 @@ pub struct Vector {
 pub const ZERO: Vector = Vector { x: 0.0, y: 0.0, z: 0.0 };
 
 impl Vector {
+    pub fn new(x: f64, y: f64, z: f64) -> Vector {
+        Vector { x: x, y: y, z: z }
+    }
+
     pub fn dot(a: Vector, b: Vector) -> f64 {
         a.x * b.x + a.y * b.y + a.z * b.z
     }
