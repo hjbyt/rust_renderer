@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign, Neg};
+use std::ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign, Neg, Rem, BitXor};
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 struct Vector {
@@ -19,6 +19,34 @@ impl Vector {
 
     pub fn new(x: f64, y: f64, z: f64) -> Vector {
         Vector { x: x, y: y, z: z }
+    }
+
+    pub fn dot(a: Vector, b: Vector) -> f64 {
+        a.x * b.x + a.y * b.y + a.z * b.z
+    }
+
+    pub fn cross(a: Vector, b: Vector) -> Vector {
+        Vector::new(
+            a.y * b.z - a.z * b.y,
+            b.x * a.z - b.z * a.x,
+            a.x * b.y - a.y * b.x)
+    }
+
+    pub fn norm_squared(self) -> f64 {
+        self % self
+    }
+
+    pub fn norm(self) -> f64 {
+        self.norm_squared().sqrt()
+    }
+
+    pub fn normalize(&mut self) {
+        *self *= 1.0 / self.norm();
+    }
+
+    pub fn normalized(self) -> Vector {
+        let s = 1.0 / self.norm();
+        self * s
     }
 }
 
@@ -120,11 +148,42 @@ impl MulAssign for Vector {
     }
 }
 
+impl MulAssign<f64> for Vector {
+    fn mul_assign(&mut self, scalar: f64) {
+        self.x *= scalar;
+        self.y *= scalar;
+        self.z *= scalar;
+    }
+}
+
+impl MulAssign<i64> for Vector {
+    fn mul_assign(&mut self, scalar: i64) {
+        let s = scalar as f64;
+        self.x *= s;
+        self.y *= s;
+        self.z *= s;
+    }
+}
+
 impl DivAssign for Vector {
     fn div_assign(&mut self, other: Vector) {
         self.x /= other.x;
         self.y /= other.y;
         self.z /= other.z;
+    }
+}
+
+impl Rem for Vector {
+    type Output = f64;
+    fn rem(self, other: Vector) -> f64 {
+        Vector::dot(self, other)
+    }
+}
+
+impl BitXor for Vector {
+    type Output = Vector;
+    fn bitxor(self, other: Vector) -> Vector {
+        Vector::cross(self, other)
     }
 }
 
@@ -142,5 +201,12 @@ mod tests {
         let b = Vector { x: 0.0, y: 1.0, z: 0.0 };
         let c = Vector { x: 0.0, y: 0.0, z: 1.0 };
         println!("{:?}", 2 * ((a * 2.5) + (b * 3) + (5.2 * c)));
+        assert_eq!(a.norm_squared(), 1.0);
+
+        let mut v = 2 * a;
+        println!("{:?}", v);
+        assert_eq!(v.x, 2.0);
+        v.normalize();
+        assert_eq!(v.x, 1.0);
     }
 }
