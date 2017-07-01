@@ -40,13 +40,26 @@ impl Vector {
         self.norm_squared().sqrt()
     }
 
-    pub fn normalize(&mut self) {
+    pub fn normalize(&mut self) -> Vector {
         *self *= 1.0 / self.norm();
+        *self
     }
 
     pub fn normalized(self) -> Vector {
         let s = 1.0 / self.norm();
         self * s
+    }
+
+    pub fn direction_to(self, other: Vector) -> Vector {
+        (other - self).normalize()
+    }
+
+    pub fn distance_to(self, other: Vector) -> f64 {
+        (other - self).norm()
+    }
+
+    pub fn distance(a: Vector, b: Vector) -> f64 {
+        a.distance_to(b)
     }
 }
 
@@ -201,12 +214,12 @@ mod tests {
         let b = Vector { x: 0.0, y: 1.0, z: 0.0 };
         let c = Vector { x: 0.0, y: 0.0, z: 1.0 };
         println!("{:?}", 2 * ((a * 2.5) + (b * 3) + (5.2 * c)));
-        assert_eq!(a.norm_squared(), 1.0);
+        assert_eq! (a.norm_squared(), 1.0);
 
         let mut v = 2 * a;
         println!("{:?}", v);
-        assert_eq!(v.x, 2.0);
+        assert_eq! (v.x, 2.0);
         v.normalize();
-        assert_eq!(v.x, 1.0);
+        assert_eq! (v.x, 1.0);
     }
 }
