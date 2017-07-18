@@ -6,6 +6,7 @@ use model_object::ModelObject;
 use material::Material;
 use sphere::Sphere;
 use color_image::ColorImage;
+use ray::Ray;
 
 pub struct Scene {
     pub background_color: Color,
@@ -52,6 +53,11 @@ impl Scene {
     }
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
+        let ray = self.camera.construct_ray_through_pixel(x, y);
+        self.color_ray_hits(ray, 0)
+    }
+
+    pub fn color_ray_hits(&self, ray : Ray, recursion_level : u32) -> Color {
         //TODO
         BLACK
     }

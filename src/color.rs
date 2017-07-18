@@ -19,14 +19,16 @@ impl Color {
         Color { r: r, g: g, b: b }
     }
 
-    pub fn clamp(&mut self) {
-        self.r = self.r.max(0.0).min(1.0);
-        self.g = self.g.max(0.0).min(1.0);
-        self.b = self.b.max(0.0).min(1.0);
+    pub fn clamped(self) -> Color {
+        Color {
+            r: self.r.max(0.0).min(1.0),
+            g: self.g.max(0.0).min(1.0),
+            b: self.b.max(0.0).min(1.0)
+        }
     }
 
     pub fn bytes(self) -> (u8, u8, u8) {
-        let c = self * 255f64;
+        let c = self.clamped() * 255f64;
         (c.r.round() as u8, c.g.round() as u8, c.b.round() as u8)
     }
 }
