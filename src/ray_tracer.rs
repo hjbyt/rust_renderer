@@ -1,5 +1,4 @@
-use vector;
-use vector::Vector;
+use vector::{self, Vector};
 use camera::Camera;
 use color::{Color, BLACK};
 use model_object::ModelObject;
@@ -7,6 +6,7 @@ use material::Material;
 use sphere::Sphere;
 use color_image::ColorImage;
 use ray::Ray;
+use hit::Hit;
 
 pub struct Scene {
     pub background_color: Color,
@@ -14,6 +14,8 @@ pub struct Scene {
     pub camera: Camera,
     //    pub lights: Vec<Light>,
 }
+
+const MAX_RECURSION: u32 = 10;
 
 //TODO: move to a scene file
 pub fn get_simple_scene() -> Scene {
@@ -54,10 +56,27 @@ impl Scene {
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
         let ray = self.camera.construct_ray_through_pixel(x, y);
-        self.color_ray_hits(ray, 0)
+        self.color_ray_hits(&ray, 0)
     }
 
-    pub fn color_ray_hits(&self, ray : Ray, recursion_level : u32) -> Color {
+    pub fn color_ray_hits(&self, ray: &Ray, recursion_level: u32) -> Color {
+        let new_recursion_level = recursion_level + 1;
+        if new_recursion_level > MAX_RECURSION {
+            return self.background_color;
+        }
+        let hits = self.find_hits(ray);
+        self.color_hits(&hits)
+    }
+
+    pub fn find_hits(&self, ray: &Ray) -> Vec<Hit> {
+        let mut hits: Vec<Hit> = self.objects.iter()
+            .filter_map(|object| object.try_hit(ray))
+            .collect::<Vec<Hit>>();
+        hits.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
+        hits
+    }
+
+    pub fn color_hits(&self, hits: &Vec<Hit>) -> Color {
         //TODO
         BLACK
     }

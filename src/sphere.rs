@@ -17,7 +17,7 @@ impl ModelObject for Sphere {
         self.material
     }
 
-    fn try_hit(&self, ray: Ray) -> Option<Hit> {
+    fn try_hit(&self, ray: &Ray) -> Option<Hit> {
         // Geometric method
         let el = self.center - ray.position;
         let t_ca = el % ray.direction;
