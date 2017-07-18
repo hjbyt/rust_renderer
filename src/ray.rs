@@ -7,7 +7,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(position: Vector, direction: Vector) -> Ray {
-        debug_assert!(direction.norm() == 1.0);
+        debug_assert!(::utils::almost_eq(direction.norm(), 1.0));
         Ray { position: position, direction: direction }
     }
 
