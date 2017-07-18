@@ -65,20 +65,34 @@ impl Scene {
             return self.background_color;
         }
         let hits = self.find_hits(ray);
-        self.color_hits(&hits)
+        self.color_hits(&hits, recursion_level)
     }
 
     pub fn find_hits(&self, ray: &Ray) -> Vec<Hit> {
         let mut hits: Vec<Hit> = self.objects.iter()
             .filter_map(|object| object.try_hit(ray))
             .collect::<Vec<Hit>>();
+        //TODO: handle NANs somehow?
         hits.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
         hits
     }
 
-    pub fn color_hits(&self, hits: &Vec<Hit>) -> Color {
-        //TODO
-        BLACK
+    pub fn color_hits(&self, hits: &Vec<Hit>, recursion_level: u32) -> Color {
+        let mut total_color = BLACK;
+        let mut prev_transparency = 1f64;
+        for hit in hits {
+            let current_transparency = hit.object.material().transparency;
+            let direct = hit.get_direct_color() * (1f64 - current_transparency);
+            let reflection = hit.get_reflection_color(recursion_level);
+            let color = (direct + reflection) * prev_transparency;
+            total_color += color;
+            prev_transparency *= current_transparency;
+            if current_transparency == 0f64 {
+                return total_color;
+            }
+        }
+
+        total_color + self.background_color * prev_transparency
     }
 }
 

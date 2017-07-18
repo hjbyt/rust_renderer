@@ -31,13 +31,14 @@ impl ModelObject for Sphere {
         }
         let t_hc = (r_square - d_square).sqrt();
         let distance_near = t_ca - t_hc;
+        //TODO: emit distance_far ?
         //let distance_far = t_ca + t_hc;
         if distance_near < 0.0 {
             return None;
         }
         let hit_point = ray.position + ray.direction * distance_near;
         let hit_normal = self.center.direction_to(hit_point);
-        let hit = Hit::new(distance_near, hit_normal, hit_point);
+        let hit = Hit::new(distance_near, hit_normal, hit_point, self);
         Some(hit)
     }
 }
