@@ -13,11 +13,11 @@ pub struct Sphere {
 }
 
 impl ModelObject for Sphere {
-    fn material(self) -> Material {
+    fn material(&self) -> Material {
         self.material
     }
 
-    fn try_hit(self, ray: Ray) -> Option<Hit> {
+    fn try_hit(&self, ray: Ray) -> Option<Hit> {
         // Geometric method
         let el = self.center - ray.position;
         let t_ca = el % ray.direction;

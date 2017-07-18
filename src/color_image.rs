@@ -18,7 +18,7 @@ impl ColorImage {
         }
     }
 
-    pub fn to_image_buffer(self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    pub fn to_image_buffer(&self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         ImageBuffer::<Rgb<u8>, Vec<u8>>::from_fn(self.width, self.height, |x, y| {
             let (r, g, b) = self[(x as usize, y as usize)].bytes();
             Rgb([r, g, b])

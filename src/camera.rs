@@ -43,7 +43,7 @@ impl Camera {
         }
     }
 
-    pub fn construct_ray_through_pixel(self, x: u32, y: u32) -> Ray {
+    pub fn construct_ray_through_pixel(&self, x: u32, y: u32) -> Ray {
         let pixel_width = self.screen_width / self.image_width as f64;
         let pixel_height = self.screen_height / self.image_height as f64;
         let y_offset = y as f64 * pixel_height - (self.screen_height / 2.0);
