@@ -10,6 +10,7 @@ mod model_object;
 mod camera;
 mod color_image;
 mod ray_tracer;
+mod light;
 
 extern crate image;
 

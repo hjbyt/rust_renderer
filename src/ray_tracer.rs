@@ -7,12 +7,13 @@ use sphere::Sphere;
 use color_image::ColorImage;
 use ray::Ray;
 use hit::Hit;
+use light::Light;
 
 pub struct Scene {
     pub background_color: Color,
     pub objects: Vec<Box<ModelObject>>,
     pub camera: Camera,
-    //    pub lights: Vec<Light>,
+    pub lights: Vec<Light>,
 }
 
 const MAX_RECURSION: u32 = 10;
@@ -34,10 +35,18 @@ pub fn get_simple_scene() -> Scene {
         center: Vector::new(0.0, 0.0, 4.0),
         radius: 1.0
     };
+    let light = Light::new(
+        Vector::new(0.0, 1.0, 1.0),
+        Color::new(1.0, 1.0, 1.0),
+        30.0,
+        1.0,
+        1.0
+    );
     Scene {
         background_color: BLACK,
         objects: vec![Box::new(sphere)],
         camera: camera,
+        lights: vec![light],
     }
 }
 
