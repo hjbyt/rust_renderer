@@ -95,14 +95,6 @@ impl Mul for Vector {
     }
 }
 
-impl Mul<i64> for Vector {
-    type Output = Vector;
-    fn mul(self, scalar: i64) -> Vector {
-        let s = scalar as f64;
-        Vector { x: self.x * s, y: self.y * s, z: self.z * s }
-    }
-}
-
 impl Mul<f64> for Vector {
     type Output = Vector;
     fn mul(self, scalar: f64) -> Vector {
@@ -114,14 +106,6 @@ impl Mul<Vector> for f64 {
     type Output = Vector;
     fn mul(self, vector: Vector) -> Vector {
         let scalar = self;
-        Vector { x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar }
-    }
-}
-
-impl Mul<Vector> for i64 {
-    type Output = Vector;
-    fn mul(self, vector: Vector) -> Vector {
-        let scalar = self as f64;
         Vector { x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar }
     }
 }
@@ -173,15 +157,6 @@ impl MulAssign<f64> for Vector {
         self.x *= scalar;
         self.y *= scalar;
         self.z *= scalar;
-    }
-}
-
-impl MulAssign<i64> for Vector {
-    fn mul_assign(&mut self, scalar: i64) {
-        let s = scalar as f64;
-        self.x *= s;
-        self.y *= s;
-        self.z *= s;
     }
 }
 

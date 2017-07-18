@@ -26,7 +26,7 @@ impl Color {
     }
 
     pub fn bytes(self) -> (u8, u8, u8) {
-        let c = self * 255;
+        let c = self * 255f64;
         (c.r.round() as u8, c.g.round() as u8, c.b.round() as u8)
     }
 }
@@ -49,14 +49,6 @@ impl Mul for Color {
     }
 }
 
-impl Mul<i64> for Color {
-    type Output = Color;
-    fn mul(self, scalar: i64) -> Color {
-        let s = scalar as f64;
-        Color { r: self.r * s, g: self.g * s, b: self.b * s }
-    }
-}
-
 impl Mul<f64> for Color {
     type Output = Color;
     fn mul(self, scalar: f64) -> Color {
@@ -68,14 +60,6 @@ impl Mul<Color> for f64 {
     type Output = Color;
     fn mul(self, vector: Color) -> Color {
         let scalar = self;
-        Color { r: vector.r * scalar, g: vector.g * scalar, b: vector.b * scalar }
-    }
-}
-
-impl Mul<Color> for i64 {
-    type Output = Color;
-    fn mul(self, vector: Color) -> Color {
-        let scalar = self as f64;
         Color { r: vector.r * scalar, g: vector.g * scalar, b: vector.b * scalar }
     }
 }
@@ -112,15 +96,6 @@ impl MulAssign<f64> for Color {
         self.r *= scalar;
         self.g *= scalar;
         self.b *= scalar;
-    }
-}
-
-impl MulAssign<i64> for Color {
-    fn mul_assign(&mut self, scalar: i64) {
-        let s = scalar as f64;
-        self.r *= s;
-        self.g *= s;
-        self.b *= s;
     }
 }
 

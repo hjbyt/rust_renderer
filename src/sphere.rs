@@ -26,7 +26,7 @@ impl ModelObject for Sphere {
         }
         let d_square = el.norm_squared() - (t_ca * t_ca);
         let r_square = self.radius * self.radius;
-        if (d_square > r_square) {
+        if d_square > r_square {
             return None;
         }
         let t_hc = (r_square - d_square).sqrt();

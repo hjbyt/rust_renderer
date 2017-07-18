@@ -12,8 +12,8 @@ pub struct Camera {
     pub image_height: u32,
     pub image_width: u32,
     pub screen_center: Vector,
-    //    pub aperature_size : f64,
-    //    pub dof_rays : i64,
+    //    pub aperture_size : f64,
+    //    pub dof_rays : u32,
 }
 
 impl Camera {
@@ -32,7 +32,7 @@ impl Camera {
         Camera {
             position: position,
             direction: direction,
-            up: up,
+            up: up_corrected,
             right: right,
             screen_distance: screen_distance,
             screen_height: screen_width * (image_height as f64 / image_width as f64),
@@ -43,7 +43,7 @@ impl Camera {
         }
     }
 
-    pub fn construct_ray_through_pixel(self, x: i64, y: i64) -> Ray {
+    pub fn construct_ray_through_pixel(self, x: u32, y: u32) -> Ray {
         let pixel_width = self.screen_width / self.image_width as f64;
         let pixel_height = self.screen_height / self.image_height as f64;
         let y_offset = y as f64 * pixel_height - (self.screen_height / 2.0);

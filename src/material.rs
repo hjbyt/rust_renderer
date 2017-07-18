@@ -1,4 +1,4 @@
-use color::{Color, BLACK};
+use color::Color;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct Material {
