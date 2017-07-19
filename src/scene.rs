@@ -21,7 +21,11 @@ const MAX_RECURSION: u32 = 10;
 
 //TODO: move to a scene file
 pub fn get_simple_scene() -> Scene {
-    let material = Material::new(Color::new(1.0, 0.0, 0.0), BLACK, BLACK, 0.0, 0.0);
+    let material = Material::new(Color::new(1.0, 0.0, 0.0),
+                                 Color::new(1.0, 1.0, 1.0),
+                                 BLACK,
+                                 30.0,
+                                 0.0);
     let camera = Camera::new(
         vector::ZERO,
         Vector::new(0.0, 0.0, 1.0),
@@ -39,12 +43,12 @@ pub fn get_simple_scene() -> Scene {
     let light = Light::new(
         Vector::new(0.0, 1.0, 1.0),
         Color::new(1.0, 1.0, 1.0),
-        30.0,
         1.0,
+        0.9,
         1.0
     );
     Scene {
-        background_color: BLACK,
+        background_color: Color::new(0.0, 1.0, 1.0),
         objects: vec![Box::new(sphere)],
         camera: camera,
         lights: vec![light],
@@ -107,8 +111,39 @@ impl Scene {
 
 
     fn get_hit_direct_color(&self, hit: &Hit) -> Color {
-        //TODO
-        hit.object.material().diffuse_color
+        let mut total_diffuse_component = BLACK;
+        let mut total_specular_component = BLACK;
+        for light in self.lights.iter() {
+            let light_intensity = self.get_light_intensity_for_hit(light, hit);
+            if light_intensity == 0.0 {
+                continue;
+            }
+
+            let light_color = light.color * light_intensity;
+            let direction_to_light = hit.hit_point.direction_to(light.position);
+
+            // Diffuse component
+            let diffusion = hit.hit_normal % direction_to_light;
+            assert!(!diffusion.is_nan() && diffusion <= 1.0);
+            let diffusion = diffusion.max(0.0);
+            let diffuse_color = light_color * diffusion;
+            total_diffuse_component += diffuse_color;
+
+            // Specular component
+            let direction_to_light_reflection = direction_to_light.reflect_around(&hit.hit_normal);
+            let cos_angle = direction_to_light_reflection % hit.direction_to_source;
+            let specular_color = if cos_angle > 0.0 {
+                let specular = cos_angle.powf(hit.object.material().phong_specularity);
+                (specular * light.specular_intensity) * light_color
+            } else {
+                BLACK
+            };
+            total_specular_component += specular_color;
+        }
+        total_diffuse_component *= hit.object.material().diffuse_color;
+        total_specular_component *= hit.object.material().specular_color;
+
+        total_diffuse_component + total_specular_component
     }
 
     fn get_hit_reflection_color(&self, hit: &Hit, recursion_level: u32) -> Color {
