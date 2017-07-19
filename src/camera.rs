@@ -27,8 +27,8 @@ impl Camera {
         image_width: u32
     ) -> Camera {
         let direction = position.direction_to(look_at);
-        let right = (up ^ direction).normalize();
-        let up_corrected = (right ^ direction).normalize();
+        let right = *(up ^ direction).normalize();
+        let up_corrected = *(right ^ direction).normalize();
         Camera {
             position: position,
             direction: direction,

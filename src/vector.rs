@@ -39,9 +39,9 @@ impl Vector {
         self.norm_squared().sqrt()
     }
 
-    pub fn normalize(&mut self) -> Vector {
+    pub fn normalize(&mut self) -> &mut Vector {
         *self *= 1.0 / self.norm();
-        *self
+        self
     }
 
     pub fn normalized(self) -> Vector {
@@ -50,7 +50,7 @@ impl Vector {
     }
 
     pub fn direction_to(self, other: Vector) -> Vector {
-        (other - self).normalize()
+        *(other - self).normalize()
     }
 
     pub fn distance_to(self, other: Vector) -> f64 {
