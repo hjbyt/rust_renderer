@@ -68,6 +68,11 @@ impl Vector {
     pub fn almost_equals(a: Vector, b: Vector, epsilon: f64) -> bool {
         a.almost_equal_to(b, epsilon)
     }
+
+    pub fn reflect_around(&self, other: &Vector) -> Vector {
+        let d = *other % *self;
+        ((2.0 * d) * *other ) - *self
+    }
 }
 
 //
