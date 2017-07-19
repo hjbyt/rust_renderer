@@ -13,6 +13,7 @@ mod ray_tracer;
 mod light;
 
 extern crate image;
+extern crate rand;
 
 fn main() {
     let scene = ray_tracer::get_simple_scene();
