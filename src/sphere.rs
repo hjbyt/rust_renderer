@@ -38,7 +38,7 @@ impl ModelObject for Sphere {
         }
         let hit_point = ray.position + ray.direction * distance_near;
         let hit_normal = self.center.direction_to(hit_point);
-        let hit = Hit::new(distance_near, hit_normal, hit_point, self);
+        let hit = Hit::new(ray, distance_near, hit_normal, hit_point, self);
         Some(hit)
     }
 }
