@@ -9,7 +9,6 @@ use ray::Ray;
 use hit::Hit;
 use light::Light;
 use rand::{self, Rng};
-use utils::almost_eq;
 
 pub struct Scene {
     pub background_color: Color,
@@ -93,8 +92,8 @@ impl Scene {
         let mut prev_transparency = 1f64;
         for hit in hits {
             let current_transparency = hit.object.material().transparency;
-            let direct = hit.get_direct_color() * (1f64 - current_transparency);
-            let reflection = hit.get_reflection_color(recursion_level);
+            let direct = self.get_hit_direct_color(hit) * (1f64 - current_transparency);
+            let reflection = self.get_hit_reflection_color(hit, recursion_level);
             let color = (direct + reflection) * prev_transparency;
             total_color += color;
             prev_transparency *= current_transparency;
@@ -106,7 +105,17 @@ impl Scene {
         total_color + self.background_color * prev_transparency
     }
 
-    pub fn get_light_intensity_for_hit(&self, light: &Light, hit: &Hit) -> f64 {
+
+    fn get_hit_direct_color(&self, hit: &Hit) -> Color {
+        //TODO
+        hit.object.material().diffuse_color
+    }
+
+    fn get_hit_reflection_color(&self, hit: &Hit, recursion_level: u32) -> Color {
+        Color::new(0.0, 0.0, 0.0) //TODO
+    }
+
+    fn get_light_intensity_for_hit(&self, light: &Light, hit: &Hit) -> f64 {
         let light_direction = hit.hit_point.direction_to(light.position);
         let direction_x = if light_direction.x == 0.0 && light_direction.y == 0.0 {
             Vector::new(1.0, 0.0, 0.0)
@@ -148,10 +157,10 @@ impl Scene {
             //TODO: make sure this short circuits
             // Check if we got to the given hit or if we passed it
             // (at object edges ray_hit can miss the original ray hit)
-            let objects_equal = ray_hit.object as *const _ == hit.object as * const _;
+            let objects_equal = ray_hit.object as *const _ == hit.object as *const _;
             let hits_almost_equal = objects_equal && ray_hit.hit_point.almost_equal_to(hit.hit_point, ::utils::EPSILON);
             let passed_max_distance = ray_hit.hit_point.distance_to(ray.position) > max_hit_distance;
-            if (hits_almost_equal || passed_max_distance) {
+            if hits_almost_equal || passed_max_distance {
                 break;
             }
             // Check if we hit an opaque object

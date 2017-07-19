@@ -1,6 +1,5 @@
 use vector::Vector;
 use model_object::ModelObject;
-use color::Color;
 
 pub struct Hit<'a> {
     pub distance: f64,
@@ -20,14 +19,5 @@ impl<'a> Hit<'a> {
             hit_point: hit_point,
             object: object
         }
-    }
-
-    pub fn get_direct_color(&self) -> Color {
-        //TODO
-        self.object.material().diffuse_color
-    }
-
-    pub fn get_reflection_color(&self, recursion_level: u32) -> Color {
-        Color::new(0.0, 0.0, 0.0) //TODO
     }
 }
