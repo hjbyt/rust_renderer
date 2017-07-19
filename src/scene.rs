@@ -4,6 +4,7 @@ use color::{Color, BLACK};
 use model_object::ModelObject;
 use material::Material;
 use sphere::Sphere;
+use plane::Plane;
 use color_image::ColorImage;
 use ray::Ray;
 use hit::Hit;
@@ -26,6 +27,11 @@ pub fn get_simple_scene() -> Scene {
                                  BLACK,
                                  30.0,
                                  0.0);
+    let material2 = Material::new(Color::new(0.0, 1.0, 0.0),
+                                  BLACK,
+                                  BLACK,
+                                  1.0,
+                                  0.0);
     let camera = Camera::new(
         vector::ZERO,
         Vector::new(0.0, 0.0, 1.0),
@@ -40,6 +46,11 @@ pub fn get_simple_scene() -> Scene {
         center: Vector::new(0.0, 0.0, 4.0),
         radius: 1.0
     };
+    let plane = Plane {
+        material: material2,
+        normal: Vector::new(0.0, 1.0, 0.0),
+        offset: -1.0
+    };
     let light = Light::new(
         Vector::new(0.0, 1.0, 1.0),
         Color::new(1.0, 1.0, 1.0),
@@ -49,7 +60,7 @@ pub fn get_simple_scene() -> Scene {
     );
     Scene {
         background_color: Color::new(0.0, 1.0, 1.0),
-        objects: vec![Box::new(sphere)],
+        objects: vec![Box::new(sphere), Box::new(plane)],
         camera: camera,
         lights: vec![light],
     }

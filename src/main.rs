@@ -2,6 +2,7 @@
 mod utils;
 mod vector;
 mod sphere;
+mod plane;
 mod color;
 mod material;
 mod ray;
