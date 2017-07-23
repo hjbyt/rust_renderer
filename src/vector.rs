@@ -12,7 +12,8 @@ pub struct Vector {
 //
 //
 
-pub const ZERO: Vector = Vector { x: 0.0, y: 0.0, z: 0.0 };
+//TODO: XXX
+//pub const ZERO: Vector = Vector { x: 0.0, y: 0.0, z: 0.0 };
 
 impl Vector {
     pub fn new(x: f64, y: f64, z: f64) -> Vector {

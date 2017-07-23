@@ -1,4 +1,4 @@
-use vector::{self, Vector};
+use vector::Vector;
 use camera::Camera;
 use color::{Color, BLACK};
 use model_object::ModelObject;
@@ -17,6 +17,9 @@ use std::fs::File;
 
 pub struct Scene {
     pub background_color: Color,
+    pub shadow_rays_n: u32,
+    pub max_recursion: u32,
+    pub super_sampling_n: u32,
     pub objects: Vec<Box<ModelObject>>,
     pub camera: Camera,
     pub lights: Vec<Light>,
@@ -25,52 +28,6 @@ pub struct Scene {
 const RAY_SMALL_ADVANCEMENT: f64 = 0.000000001;
 
 const MAX_RECURSION: u32 = 10;
-
-//TODO: move to a scene file
-pub fn get_simple_scene() -> Scene {
-    let material = Material::new(Color::new(1.0, 0.0, 0.0),
-                                 Color::new(1.0, 1.0, 1.0),
-                                 BLACK,
-                                 30.0,
-                                 0.0);
-    let material2 = Material::new(Color::new(0.0, 1.0, 0.0),
-                                  BLACK,
-                                  BLACK,
-                                  1.0,
-                                  0.0);
-    let camera = Camera::new(
-        vector::ZERO,
-        Vector::new(0.0, 0.0, 1.0),
-        Vector::new(0.0, 1.0, 0.0),
-        1.4,
-        1.0,
-        500,
-        500
-    );
-    let sphere = Sphere {
-        material: material,
-        center: Vector::new(0.0, 0.0, 4.0),
-        radius: 1.0
-    };
-    let plane = Plane {
-        material: material2,
-        normal: Vector::new(0.0, 1.0, 0.0),
-        offset: -1.0
-    };
-    let light = Light::new(
-        Vector::new(0.0, 1.0, 1.0),
-        Color::new(1.0, 1.0, 1.0),
-        1.0,
-        0.9,
-        1.0
-    );
-    Scene {
-        background_color: Color::new(0.0, 1.0, 1.0),
-        objects: vec![Box::new(sphere), Box::new(plane)],
-        camera: camera,
-        lights: vec![light],
-    }
-}
 
 impl Scene {
     pub fn from_file_path(file_path: &str) -> io::Result<Scene> {
@@ -161,8 +118,12 @@ impl Scene {
         let camera = camera.expect("Camera item not found"); //TODO
         let settings = settings.expect("Settings item not found"); //TODO
 
+        let (background_color, shadow_rays_n, max_recursion, super_sampling_n) = settings;
         Ok(Scene {
-            background_color: settings.0,
+            background_color,
+            shadow_rays_n,
+            max_recursion,
+            super_sampling_n,
             objects,
             camera,
             lights,
