@@ -22,6 +22,8 @@ pub struct Scene {
     pub lights: Vec<Light>,
 }
 
+const RAY_SMALL_ADVANCEMENT: f64 = 0.000000001;
+
 const MAX_RECURSION: u32 = 10;
 
 //TODO: move to a scene file
@@ -243,13 +245,11 @@ impl Scene {
             if hit.object.material().is_specular() {
                 let direction_to_light_reflection = direction_to_light.reflect_around(&hit.hit_normal);
                 let cos_angle = direction_to_light_reflection % hit.direction_to_source;
-                let specular_color = if cos_angle > 0.0 {
+                if cos_angle > 0.0 {
                     let specular = cos_angle.powf(hit.object.material().phong_specularity);
-                    (specular * light.specular_intensity) * light_color
-                } else {
-                    BLACK
-                };
-                total_specular_component += specular_color;
+                    let specular_color = (specular * light.specular_intensity) * light_color;
+                    total_specular_component += specular_color;
+                }
             }
         }
         total_diffuse_component *= hit.object.material().diffuse_color;
@@ -259,7 +259,16 @@ impl Scene {
     }
 
     fn get_hit_reflection_color(&self, hit: &Hit, recursion_level: u32) -> Color {
-        Color::new(0.0, 0.0, 0.0) //TODO
+        if !hit.object.material().is_reflective() {
+            return BLACK;
+        }
+        let hit_reflection_direction = hit.direction_to_source.reflect_around(&hit.hit_normal);
+        debug_assert!(::utils::almost_eq(hit_reflection_direction.norm(), 1.0));
+        let mut reflection_ray = Ray::new(hit.hit_point, hit_reflection_direction);
+        // Move reflection exit point forward a bit to avoid numeric issues (hitting the same surface)
+        reflection_ray.advance(RAY_SMALL_ADVANCEMENT);
+        let reflection_color = self.color_ray_hits(&reflection_ray, recursion_level);
+        reflection_color * hit.object.material().reflection_color
     }
 
     fn get_light_intensity_for_hit(&self, light: &Light, hit: &Hit) -> f64 {
