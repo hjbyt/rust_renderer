@@ -240,15 +240,17 @@ impl Scene {
             total_diffuse_component += diffuse_color;
 
             // Specular component
-            let direction_to_light_reflection = direction_to_light.reflect_around(&hit.hit_normal);
-            let cos_angle = direction_to_light_reflection % hit.direction_to_source;
-            let specular_color = if cos_angle > 0.0 {
-                let specular = cos_angle.powf(hit.object.material().phong_specularity);
-                (specular * light.specular_intensity) * light_color
-            } else {
-                BLACK
-            };
-            total_specular_component += specular_color;
+            if hit.object.material().is_specular() {
+                let direction_to_light_reflection = direction_to_light.reflect_around(&hit.hit_normal);
+                let cos_angle = direction_to_light_reflection % hit.direction_to_source;
+                let specular_color = if cos_angle > 0.0 {
+                    let specular = cos_angle.powf(hit.object.material().phong_specularity);
+                    (specular * light.specular_intensity) * light_color
+                } else {
+                    BLACK
+                };
+                total_specular_component += specular_color;
+            }
         }
         total_diffuse_component *= hit.object.material().diffuse_color;
         total_specular_component *= hit.object.material().specular_color;
@@ -309,7 +311,7 @@ impl Scene {
                 break;
             }
             // Check if we hit an opaque object
-            if ray_hit.object.material().transparency == 0.0 {
+            if !ray_hit.object.material().is_transparent() {
                 ray_intensity = 0.0;
                 break;
             }

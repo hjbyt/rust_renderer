@@ -1,4 +1,4 @@
-use color::Color;
+use color::{Color, BLACK};
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct Material {
@@ -7,6 +7,9 @@ pub struct Material {
     pub reflection_color: Color,
     pub phong_specularity: f64,
     pub transparency: f64,
+    _is_transparent: bool,
+    _is_reflective: bool,
+    _is_specular: bool,
 }
 
 impl Material {
@@ -21,7 +24,22 @@ impl Material {
             specular_color: specular_color,
             reflection_color: reflection_color,
             phong_specularity: phong_specularity,
-            transparency: transparency
+            transparency: transparency,
+            _is_transparent : transparency > 0.0,
+            _is_reflective: reflection_color != BLACK,
+            _is_specular: specular_color != BLACK,
         }
+    }
+
+    pub fn is_transparent(&self) -> bool {
+        self._is_transparent
+    }
+
+    pub fn is_reflective(&self) -> bool {
+        self._is_reflective
+    }
+
+    pub fn is_specular(&self) -> bool {
+        self._is_specular
     }
 }
