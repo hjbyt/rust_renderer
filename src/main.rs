@@ -17,7 +17,7 @@ extern crate image;
 extern crate rand;
 
 fn main() {
-    let scene = scene::scene_from_file_path("scenes/Simple.txt").unwrap(); //TODO
+    let scene = scene::Scene::from_file_path("scenes/Simple.txt").unwrap(); //TODO
     let color_image = scene.render();
     let image_buffer = color_image.to_image_buffer();
     image_buffer.save("output.png").unwrap();

@@ -71,6 +71,102 @@ pub fn get_simple_scene() -> Scene {
 }
 
 impl Scene {
+    pub fn from_file_path(file_path: &str) -> io::Result<Scene> {
+        let file = File::open(file_path)?;
+        let reader = BufReader::new(file);
+
+        let mut camera: Option<Camera> = None;
+        let mut settings: Option<(Color, u32, u32, u32)> = None;
+        let mut materials: Vec<Material> = Vec::new();
+        let mut objects: Vec<Box<ModelObject>> = Vec::new();
+        let mut lights: Vec<Light> = Vec::new();
+
+        for line in reader.lines() {
+            let line = line?;
+            let line = line.trim();
+
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            let mut parts = &mut line.split_whitespace();
+            let item_type = parts.next().unwrap(); //Note: this can't fail because line is not empty
+            match item_type {
+                "cam" => {
+                    camera = Some(Camera::new(
+                        parse_vector(parts),
+                        parse_vector(parts),
+                        parse_vector(parts),
+                        parse_f64(parts),
+                        parse_f64(parts),
+                        500, //TODO
+                        500, //TODO
+                    ));
+                }
+                "set" => {
+                    settings = Some((
+                        parse_color(parts),
+                        parse_u32(parts),
+                        parse_u32(parts),
+                        parse_u32(parts),
+                    ));
+                }
+                "mtl" => {
+                    materials.push(Material::new(
+                        parse_color(parts),
+                        parse_color(parts),
+                        parse_color(parts),
+                        parse_f64(parts),
+                        parse_f64(parts),
+                    ));
+                }
+                "sph" => {
+                    objects.push(Box::new(Sphere {
+                        center: parse_vector(parts),
+                        radius: parse_f64(parts),
+                        material: materials[parse_u32(parts) as usize - 1],
+                    }));
+                }
+                "pln" => {
+                    objects.push(Box::new(Plane {
+                        normal: parse_vector(parts),
+                        offset: parse_f64(parts),
+                        material: materials[parse_u32(parts) as usize - 1],
+                    }));
+                }
+                "trg" => {
+                    unimplemented!();
+                    //objects.push(Box::new(Triangle::new(
+                    //    parse_vector(parts),
+                    //    parse_vector(parts),
+                    //    parse_vector(parts),
+                    //    parse_uint(parts),
+                    //)));
+                }
+                "lgt" => {
+                    lights.push(Light::new(
+                        parse_vector(parts),
+                        parse_color(parts),
+                        parse_f64(parts),
+                        parse_f64(parts),
+                        parse_f64(parts),
+                    ));
+                }
+                _ => panic!("Unrecognized scene item") //TODO: return error
+            }
+        }
+
+        let camera = camera.expect("Camera item not found"); //TODO
+        let settings = settings.expect("Settings item not found"); //TODO
+
+        Ok(Scene {
+            background_color: settings.0,
+            objects,
+            camera,
+            lights,
+        })
+    }
+
     pub fn render(&self) -> ColorImage {
         let width = self.camera.image_width;
         let height = self.camera.image_height;
@@ -123,7 +219,6 @@ impl Scene {
 
         total_color + self.background_color * prev_transparency
     }
-
 
     fn get_hit_direct_color(&self, hit: &Hit) -> Color {
         let mut total_diffuse_component = BLACK;
@@ -223,103 +318,6 @@ impl Scene {
         }
         ray_intensity
     }
-}
-
-
-pub fn scene_from_file_path(file_path: &str) -> io::Result<Scene> {
-    let file = File::open(file_path)?;
-    let reader = BufReader::new(file);
-
-    let mut camera: Option<Camera> = None;
-    let mut settings: Option<(Color, u32, u32, u32)> = None;
-    let mut materials: Vec<Material> = Vec::new();
-    let mut objects: Vec<Box<ModelObject>> = Vec::new();
-    let mut lights: Vec<Light> = Vec::new();
-
-    for line in reader.lines() {
-        let line = line?;
-        let line = line.trim();
-
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-
-        let mut parts = &mut line.split_whitespace();
-        let item_type = parts.next().unwrap(); //Note: this can't fail because line is not empty
-        match item_type {
-            "cam" => {
-                camera = Some(Camera::new(
-                    parse_vector(parts),
-                    parse_vector(parts),
-                    parse_vector(parts),
-                    parse_f64(parts),
-                    parse_f64(parts),
-                    500, //TODO
-                    500, //TODO
-                ));
-            }
-            "set" => {
-                settings = Some((
-                    parse_color(parts),
-                    parse_u32(parts),
-                    parse_u32(parts),
-                    parse_u32(parts),
-                ));
-            }
-            "mtl" => {
-                materials.push(Material::new(
-                    parse_color(parts),
-                    parse_color(parts),
-                    parse_color(parts),
-                    parse_f64(parts),
-                    parse_f64(parts),
-                ));
-            }
-            "sph" => {
-                objects.push(Box::new(Sphere {
-                    center: parse_vector(parts),
-                    radius: parse_f64(parts),
-                    material: materials[parse_u32(parts) as usize - 1],
-                }));
-            }
-            "pln" => {
-                objects.push(Box::new(Plane {
-                    normal: parse_vector(parts),
-                    offset: parse_f64(parts),
-                    material: materials[parse_u32(parts) as usize - 1],
-                }));
-            }
-            "trg" => {
-                unimplemented!();
-                //objects.push(Box::new(Triangle::new(
-                //    parse_vector(parts),
-                //    parse_vector(parts),
-                //    parse_vector(parts),
-                //    parse_uint(parts),
-                //)));
-            }
-            "lgt" => {
-                lights.push(Light::new(
-                    parse_vector(parts),
-                    parse_color(parts),
-                    parse_f64(parts),
-                    parse_f64(parts),
-                    parse_f64(parts),
-                ));
-            }
-            _ => panic!("Unrecognized scene item") //TODO: return error
-        }
-    }
-
-    let camera = camera.expect("Camera item not found"); //TODO
-    let settings = settings.expect("Settings item not found"); //TODO
-
-    Ok(Scene {
-        background_color: settings.0,
-        objects,
-        camera,
-        lights,
-    })
 }
 
 //TODO: fix error handling
