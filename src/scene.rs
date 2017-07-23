@@ -27,8 +27,6 @@ pub struct Scene {
 
 const RAY_SMALL_ADVANCEMENT: f64 = 0.000000001;
 
-const MAX_RECURSION: u32 = 10;
-
 impl Scene {
     pub fn from_file_path(file_path: &str) -> io::Result<Scene> {
         let file = File::open(file_path)?;
@@ -143,13 +141,14 @@ impl Scene {
     }
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
+        //TODO: super-sampling
         let ray = self.camera.construct_ray_through_pixel(x, y);
         self.color_ray_hits(&ray, 0)
     }
 
     pub fn color_ray_hits(&self, ray: &Ray, recursion_level: u32) -> Color {
         let new_recursion_level = recursion_level + 1;
-        if new_recursion_level > MAX_RECURSION {
+        if new_recursion_level > self.max_recursion {
             return self.background_color;
         }
         let hits = self.find_hits(ray);
@@ -242,8 +241,7 @@ impl Scene {
         };
         let direction_y = *(light_direction ^ direction_x).normalize();
 
-        //TODO: get from scene
-        let n: u32 = 1;
+        let n = self.shadow_rays_n;
         let cell_radius = light.radius / n as f64;
         let hald_radius = cell_radius / 2.0;
 
