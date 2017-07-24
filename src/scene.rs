@@ -14,6 +14,7 @@ use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
+use std::path::Path;
 
 pub struct Scene {
     pub background_color: Color,
@@ -28,7 +29,7 @@ pub struct Scene {
 const RAY_SMALL_ADVANCEMENT: f64 = 0.000000001;
 
 impl Scene {
-    pub fn from_file_path(file_path: &str) -> io::Result<Scene> {
+    pub fn from_file_path<P: AsRef<Path>>(file_path: P) -> io::Result<Scene> {
         let file = File::open(file_path)?;
         let reader = BufReader::new(file);
 
@@ -307,4 +308,52 @@ fn parse_vector<'a, I: Iterator<Item=&'a str>>(params: &mut I) -> Vector {
 
 fn parse_color<'a, I: Iterator<Item=&'a str>>(params: &mut I) -> Color {
     Color::new(parse_f64(params), parse_f64(params), parse_f64(params))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use std::fs;
+
+    fn test_scene(file_name: &str) {
+        let scene_path: PathBuf = ["scenes", file_name].iter().collect();
+        let scene = Scene::from_file_path(scene_path).expect("Could not create scene");
+        let color_image = scene.render();
+        let image_buffer = color_image.to_image_buffer();
+        let mut output_path: PathBuf = ["outputs", file_name].iter().collect();
+        output_path.set_extension("png");
+        fs::create_dir_all(&output_path.parent().unwrap()).expect("Could not create output directory");
+        image_buffer.save(&output_path).expect("Could not save output");
+    }
+
+    #[test]
+    fn test_simple() {
+        test_scene("Simple.txt");
+    }
+
+    #[test]
+    fn test_pool() {
+        test_scene("Pool.txt");
+    }
+
+    #[test]
+    fn test_room1() {
+        test_scene("Room1.txt");
+    }
+
+    #[test]
+    fn test_room10() {
+        test_scene("Room10.txt");
+    }
+
+    #[test]
+    fn test_spheres() {
+        test_scene("Spheres.txt");
+    }
+
+    #[test]
+    fn test_triangle() {
+        test_scene("Triangle.txt");
+    }
 }
