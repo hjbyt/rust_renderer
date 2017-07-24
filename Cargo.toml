@@ -6,3 +6,7 @@ authors = ["hjbyt <sopu00@gmail.com>"]
 [dependencies]
 image = "*"
 rand = "*"
+
+[profile.test]
+opt-level = 1
+#lto = true
