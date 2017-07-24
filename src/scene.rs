@@ -315,11 +315,16 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
     use std::fs;
+    use std::time::Instant;
 
     fn test_scene(file_name: &str) {
         let scene_path: PathBuf = ["scenes", file_name].iter().collect();
         let scene = Scene::from_file_path(scene_path).expect("Could not create scene");
+        let start = Instant::now();
         let color_image = scene.render();
+        let duration = start.elapsed();
+        let duration = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+        println!("Rendered scene in {:.3} seconds", duration);
         let image_buffer = color_image.to_image_buffer();
         let mut output_path: PathBuf = ["outputs", file_name].iter().collect();
         output_path.set_extension("png");
