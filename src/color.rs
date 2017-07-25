@@ -1,4 +1,5 @@
 use std::ops::{Add, Mul, Div, AddAssign, MulAssign, DivAssign};
+use std::iter::Sum;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct Color {
@@ -73,6 +74,13 @@ impl Div for Color {
     }
 }
 
+impl Div<f64> for Color {
+    type Output = Color;
+    fn div(self, scalar: f64) -> Color {
+        Color { r: self.r / scalar, g: self.g / scalar, b: self.b / scalar }
+    }
+}
+
 //
 //
 //
@@ -106,5 +114,23 @@ impl DivAssign for Color {
         self.r /= other.r;
         self.g /= other.g;
         self.b /= other.b;
+    }
+}
+
+impl DivAssign<f64> for Color {
+    fn div_assign(&mut self, scalar: f64) {
+        self.r /= scalar;
+        self.g /= scalar;
+        self.b /= scalar;
+    }
+}
+
+impl Sum for Color {
+    fn sum<I: Iterator<Item=Color>>(iter: I) -> Color {
+        let mut total_color = BLACK;
+        for color in iter {
+            total_color += color;
+        }
+        total_color
     }
 }

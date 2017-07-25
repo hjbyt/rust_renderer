@@ -59,6 +59,7 @@ impl Scene {
                         parse_f64(parts),
                         500, //TODO
                         500, //TODO
+                        1,
                     ));
                 }
                 "set" => {
@@ -114,10 +115,11 @@ impl Scene {
             }
         }
 
-        let camera = camera.expect("Camera item not found"); //TODO
+        let mut camera = camera.expect("Camera item not found"); //TODO
         let settings = settings.expect("Settings item not found"); //TODO
 
         let (background_color, shadow_rays_n, max_recursion, super_sampling_n) = settings;
+        camera.super_sampling_n = super_sampling_n;
         Ok(Scene {
             background_color,
             shadow_rays_n,
@@ -142,9 +144,12 @@ impl Scene {
     }
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
-        //TODO: super-sampling
-        let ray = self.camera.construct_ray_through_pixel(x, y);
-        self.color_ray_hits(&ray, 0)
+        let rays = self.camera.construct_rays_through_pixel(x, y);
+        let len = rays.len();
+        let total_color: Color = rays.into_iter()
+            .map(|ray| self.color_ray_hits(&ray, 0))
+            .sum();
+        total_color / len as f64
     }
 
     pub fn color_ray_hits(&self, ray: &Ray, recursion_level: u32) -> Color {
@@ -247,7 +252,7 @@ impl Scene {
         let hald_radius = cell_radius / 2.0;
 
         let mut total_intensity = 0.0;
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::thread_rng(); //TODO: switch to fast RNG, with hardcoded seed...
         for x in 0..n {
             for y in 0..n {
                 let x_offset = cell_radius * (x as f64 + rng.next_f64()) - hald_radius;
@@ -324,7 +329,7 @@ mod tests {
         let color_image = scene.render();
         let duration = start.elapsed();
         let duration = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
-        println!("Rendered scene in {:.3} seconds", duration);
+        println!("Rendered scene {} in {:.3} seconds", file_name, duration);
         let image_buffer = color_image.to_image_buffer();
         let mut output_path: PathBuf = ["outputs", file_name].iter().collect();
         output_path.set_extension("png");
@@ -343,7 +348,7 @@ mod tests {
     }
 
     #[test]
-    fn test_room1() {
+    fn test_room1_() {
         test_scene("Room1.txt");
     }
 
