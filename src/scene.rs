@@ -217,7 +217,7 @@ impl Scene {
             }
 
             let light_color = light.color * light_intensity;
-            let direction_to_light = hit.hit_point.direction_to(light.position);
+            let direction_to_light = hit.hit_point.direction_to(&light.position);
 
             // Diffuse component
             let diffusion = hit.hit_normal % direction_to_light;
@@ -257,7 +257,7 @@ impl Scene {
     }
 
     fn get_light_intensity_for_hit(&self, light: &Light, hit: &Hit) -> f64 {
-        let light_direction = hit.hit_point.direction_to(light.position);
+        let light_direction = hit.hit_point.direction_to(&light.position);
         let direction_x = if light_direction.x == 0.0 && light_direction.y == 0.0 {
             Vector::new(1.0, 0.0, 0.0)
         } else {
@@ -292,14 +292,14 @@ impl Scene {
 
     fn get_ray_intensity(&self, hit: &Hit, ray: &Ray) -> f64 {
         let mut ray_intensity = 1.0;
-        let max_hit_distance = hit.hit_point.distance_to(ray.position) + ::utils::EPSILON;
+        let max_hit_distance = hit.hit_point.distance_to(&ray.position) + ::utils::EPSILON;
         for ray_hit in self.find_hits(ray) {
             //TODO: make sure this short circuits
             // Check if we got to the given hit or if we passed it
             // (at object edges ray_hit can miss the original ray hit)
             let objects_equal = ray_hit.object as *const _ == hit.object as *const _;
-            let hits_almost_equal = objects_equal && ray_hit.hit_point.almost_equal_to(hit.hit_point, ::utils::EPSILON);
-            let passed_max_distance = ray_hit.hit_point.distance_to(ray.position) > max_hit_distance;
+            let hits_almost_equal = objects_equal && ray_hit.hit_point.almost_equal_to(&hit.hit_point, ::utils::EPSILON);
+            let passed_max_distance = ray_hit.hit_point.distance_to(&ray.position) > max_hit_distance;
             if hits_almost_equal || passed_max_distance {
                 break;
             }

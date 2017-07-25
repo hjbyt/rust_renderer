@@ -12,7 +12,7 @@ impl Ray {
     }
 
     pub fn construct_ray(from: Vector, to: Vector) -> Ray {
-        Ray::new(from, from.direction_to(to))
+        Ray::new(from, from.direction_to(&to))
     }
 
     pub fn advance(&mut self, by: f64) {

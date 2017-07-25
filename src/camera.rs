@@ -29,7 +29,7 @@ impl Camera {
         image_width: u32,
         super_sampling_n: u32,
     ) -> Camera {
-        let direction = position.direction_to(look_at);
+        let direction = position.direction_to(&look_at);
         let right = *(up ^ direction).normalize();
         let up_corrected = *(right ^ direction).normalize();
         Camera {

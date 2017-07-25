@@ -20,11 +20,11 @@ impl Vector {
         Vector { x: x, y: y, z: z }
     }
 
-    pub fn dot(a: Vector, b: Vector) -> f64 {
+    pub fn dot(a: &Vector, b: &Vector) -> f64 {
         a.x * b.x + a.y * b.y + a.z * b.z
     }
 
-    pub fn cross(a: Vector, b: Vector) -> Vector {
+    pub fn cross(a: &Vector, b: &Vector) -> Vector {
         Vector {
             x: a.y * b.z - a.z * b.y,
             y: b.x * a.z - b.z * a.x,
@@ -32,11 +32,11 @@ impl Vector {
         }
     }
 
-    pub fn norm_squared(self) -> f64 {
-        self % self
+    pub fn norm_squared(&self) -> f64 {
+        *self % *self
     }
 
-    pub fn norm(self) -> f64 {
+    pub fn norm(&self) -> f64 {
         self.norm_squared().sqrt()
     }
 
@@ -45,28 +45,28 @@ impl Vector {
         self
     }
 
-    pub fn normalized(self) -> Vector {
+    pub fn normalized(&self) -> Vector {
         let s = 1.0 / self.norm();
-        self * s
+        *self * s
     }
 
-    pub fn direction_to(self, other: Vector) -> Vector {
-        *(other - self).normalize()
+    pub fn direction_to(&self, other: &Vector) -> Vector {
+        *(*other - *self).normalize()
     }
 
-    pub fn distance_to(self, other: Vector) -> f64 {
-        (other - self).norm()
+    pub fn distance_to(&self, other: &Vector) -> f64 {
+        (*other - *self).norm()
     }
 
-    pub fn distance(a: Vector, b: Vector) -> f64 {
+    pub fn distance(a: &Vector, b: &Vector) -> f64 {
         a.distance_to(b)
     }
 
-    pub fn almost_equal_to(self, other: Vector, epsilon: f64) -> bool {
+    pub fn almost_equal_to(&self, other: &Vector, epsilon: f64) -> bool {
         self.distance_to(other) <= epsilon
     }
 
-    pub fn almost_equals(a: Vector, b: Vector, epsilon: f64) -> bool {
+    pub fn almost_equals(a: &Vector, b: &Vector, epsilon: f64) -> bool {
         a.almost_equal_to(b, epsilon)
     }
 
@@ -177,13 +177,13 @@ impl DivAssign for Vector {
 impl Rem for Vector {
     type Output = f64;
     fn rem(self, other: Vector) -> f64 {
-        Vector::dot(self, other)
+        Vector::dot(&self, &other)
     }
 }
 
 impl BitXor for Vector {
     type Output = Vector;
     fn bitxor(self, other: Vector) -> Vector {
-        Vector::cross(self, other)
+        Vector::cross(&self, &other)
     }
 }
