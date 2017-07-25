@@ -5,6 +5,7 @@ use model_object::ModelObject;
 use material::Material;
 use sphere::Sphere;
 use plane::Plane;
+use triangle::Triangle;
 use color_image::ColorImage;
 use ray::Ray;
 use hit::Hit;
@@ -97,13 +98,12 @@ impl Scene {
                     }));
                 }
                 "trg" => {
-                    unimplemented!();
-                    //objects.push(Box::new(Triangle::new(
-                    //    parse_vector(parts),
-                    //    parse_vector(parts),
-                    //    parse_vector(parts),
-                    //    parse_uint(parts),
-                    //)));
+                    objects.push(Box::new(Triangle::new(
+                        parse_vector(parts),
+                        parse_vector(parts),
+                        parse_vector(parts),
+                        materials[parse_u32(parts) as usize - 1],
+                    )));
                 }
                 "lgt" => {
                     lights.push(Light::new(

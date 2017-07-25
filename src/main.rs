@@ -3,6 +3,7 @@ mod utils;
 mod vector;
 mod sphere;
 mod plane;
+mod triangle;
 mod color;
 mod material;
 mod ray;
