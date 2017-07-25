@@ -15,13 +15,16 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 use std::path::Path;
+use std::sync::Arc;
+use threadpool::ThreadPool;
+use std::sync::mpsc;
 
 pub struct Scene {
     pub background_color: Color,
     pub shadow_rays_n: u32,
     pub max_recursion: u32,
     pub super_sampling_n: u32,
-    pub objects: Vec<Box<ModelObject>>,
+    pub objects: Vec<Box<ModelObject + Send + Sync>>,
     pub camera: Camera,
     pub lights: Vec<Light>,
 }
@@ -36,7 +39,7 @@ impl Scene {
         let mut camera: Option<Camera> = None;
         let mut settings: Option<(Color, u32, u32, u32)> = None;
         let mut materials: Vec<Material> = Vec::new();
-        let mut objects: Vec<Box<ModelObject>> = Vec::new();
+        let mut objects: Vec<Box<ModelObject + Send + Sync>> = Vec::new();
         let mut lights: Vec<Light> = Vec::new();
 
         for line in reader.lines() {
@@ -131,16 +134,32 @@ impl Scene {
         })
     }
 
-    pub fn render(&self) -> ColorImage {
+    pub fn render(self, thread_count: usize) -> ColorImage {
         let width = self.camera.image_width;
         let height = self.camera.image_height;
-        let mut color_image = ColorImage::new(width, height);
+
+        let scene = Arc::new(self);
+        let pool = ThreadPool::new(thread_count);
+        let (tx, rx) = mpsc::channel();
+
         for y in 0..height {
-            for x in 0..width {
-                color_image[(x as usize, y as usize)] = self.render_pixel(x, y);
-            }
+            let thread_tx = tx.clone();
+            let thread_scene = scene.clone();
+            pool.execute(move || {
+                thread_tx.send((y, thread_scene.render_row(y))).unwrap();
+            })
+        }
+        drop(tx);
+
+        let mut color_image = ColorImage::new(width, height);
+        for (y, row) in rx.iter() {
+            &color_image.pixels[(y * width) as usize..((y + 1) * width) as usize].copy_from_slice(&row);
         }
         color_image
+    }
+
+    pub fn render_row(&self, y: u32) -> Vec<Color> {
+        (0..self.camera.image_width).map(|x| self.render_pixel(x, y)).collect()
     }
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
@@ -321,12 +340,13 @@ mod tests {
     use std::path::PathBuf;
     use std::fs;
     use std::time::Instant;
+    use num_cpus;
 
     fn test_scene(file_name: &str) {
         let scene_path: PathBuf = ["scenes", file_name].iter().collect();
         let scene = Scene::from_file_path(scene_path).expect("Could not create scene");
         let start = Instant::now();
-        let color_image = scene.render();
+        let color_image = scene.render(num_cpus::get());
         let duration = start.elapsed();
         let duration = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
         println!("Rendered scene {} in {:.3} seconds", file_name, duration);
