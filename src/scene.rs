@@ -386,4 +386,9 @@ mod tests {
     fn test_triangle() {
         test_scene("Triangle.txt");
     }
+
+    #[test]
+    fn test_transparency() {
+        test_scene("Transparency.txt");
+    }
 }
