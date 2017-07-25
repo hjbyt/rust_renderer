@@ -15,6 +15,8 @@ mod light;
 
 extern crate image;
 extern crate rand;
+extern crate threadpool;
+extern crate num_cpus;
 
 fn main() {
     let scene = scene::Scene::from_file_path("scenes/Pool.txt").unwrap(); //TODO
