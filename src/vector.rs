@@ -72,13 +72,21 @@ impl Vector {
 
     pub fn reflect_around(&self, other: &Vector) -> Vector {
         let d = *other % *self;
-        ((2.0 * d) * *other ) - *self
+        ((2.0 * d) * *other) - *self
     }
 }
 
 //
 //
 //
+
+//TODO: add by-reference operator overloading variants like this
+//impl<'a, 'b> Add<&'b Vector> for &'a Vector {
+//    type Output = Vector;
+//    fn add(self, other: &'b Vector) -> Vector {
+//        Vector { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z }
+//    }
+//}
 
 impl Add for Vector {
     type Output = Self;
