@@ -55,9 +55,9 @@ impl Camera {
         let sub_pixel_height = pixel_height / n as f64;
         //TODO: instead of creating new array, fill array given by arg, or yield rays as an iterator.
         let mut rays = Vec::with_capacity((n * n) as usize);
-        for i in 1..n+1 {
+        for i in 0..n {
             let sub_pixel_x = n * x + i;
-            for j in 1..n+1 {
+            for j in 0..n {
                 let sub_pixel_y = n * y + j;
                 let x_offset = sub_pixel_width * (sub_pixel_x as f64 + self.get_rand() - 0.5) - (self.screen_width as f64 / 2.0);
                 let y_offset = sub_pixel_height * (sub_pixel_y as f64 + self.get_rand() - 0.5) - (self.screen_height as f64 / 2.0);
