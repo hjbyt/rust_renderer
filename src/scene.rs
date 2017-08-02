@@ -165,9 +165,7 @@ impl Scene {
     pub fn render_pixel(&self, x: u32, y: u32) -> Color {
         let rays = self.camera.construct_rays_through_pixel(x, y);
         let len = rays.len();
-        let total_color: Color = rays.into_iter()
-            .map(|ray| self.color_ray_hits(&ray, 0))
-            .sum();
+        let total_color: Color = rays.map(|ray| self.color_ray_hits(&ray, 0)).sum();
         total_color / len as f64
     }
 
