@@ -266,14 +266,14 @@ impl Scene {
 
         let n = self.shadow_rays_n;
         let cell_radius = light.radius / n as f64;
-        let hald_radius = cell_radius / 2.0;
+        let half_radius = cell_radius / 2.0;
 
         let mut total_intensity = 0.0;
         let mut rng = rand::thread_rng(); //TODO: switch to fast RNG, with hardcoded seed...
         for x in 0..n {
             for y in 0..n {
-                let x_offset = cell_radius * (x as f64 + rng.next_f64()) - hald_radius;
-                let y_offset = cell_radius * (y as f64 + rng.next_f64()) - hald_radius;
+                let x_offset = cell_radius * (x as f64 + rng.next_f64()) - half_radius;
+                let y_offset = cell_radius * (y as f64 + rng.next_f64()) - half_radius;
                 let x_delta = direction_x * x_offset;
                 let y_delta = direction_y * y_offset;
                 let cell_point = light.position + x_delta + y_delta;
